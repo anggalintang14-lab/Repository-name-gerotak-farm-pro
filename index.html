@@ -17,570 +17,316 @@ Upgrade Features:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>GEROTAK FARM PRO ULTIMATE</title>
 
+<!-- Tailwind CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
-
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<!-- jsPDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
 <style>
-
-body{
-    background:#07111f;
-    color:white;
-    font-family:Arial,sans-serif;
-}
-
-.glass{
-    background:rgba(255,255,255,0.05);
-    backdrop-filter:blur(12px);
-    border:1px solid rgba(255,255,255,0.08);
-}
-
+  :root{--glass-bg:rgba(255,255,255,0.04);--glass-border:rgba(255,255,255,0.06);}
+  html,body{height:100%}
+  body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; background:linear-gradient(180deg,#061021 0%,#071426 100%); color:#e6eef6}
+  .glass{background:var(--glass-bg);backdrop-filter:blur(8px);border:1px solid var(--glass-border)}
+  /* nice scroll for bahan list */
+  .scroll-smooth::-webkit-scrollbar{width:8px;height:8px}
+  .scroll-smooth::-webkit-scrollbar-track{background:transparent}
+  .scroll-smooth::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.04);border-radius:999px}
+  /* checkbox as pill */
+  .bahan-label{display:flex;align-items:center;gap:.6rem;padding:.55rem .7rem;border-radius:12px;background:transparent;cursor:pointer;border:1px solid transparent}
+  .bahan-label:hover{background:rgba(255,255,255,0.02)}
+  .bahan-label input{accent-color:#10b981}
+  table th, table td{padding:.6rem .75rem}
+  table thead th{background:transparent;font-weight:600;color:#bcd5dd}
+  .btn-primary{background:linear-gradient(90deg,#06b6d4,#0891b2);color:#062127}
 </style>
 
 </head>
-
 <body>
 
 <!-- LOGIN -->
+<div id="loginPage" class="min-h-screen flex items-center justify-center p-6">
+  <div class="glass p-8 rounded-2xl w-full max-w-md shadow-lg">
+    <h1 class="text-2xl font-bold text-emerald-400 mb-4 text-center">GEROTAK FARM PRO</h1>
+    <p class="text-sm text-slate-300 text-center mb-6">Masuk sebagai admin untuk mengelola formula dan menjalankan optimasi</p>
 
-<div id="loginPage"
-class="min-h-screen flex items-center justify-center p-5">
+    <input type="text" id="username" placeholder="Username" class="w-full p-3 rounded-xl bg-slate-900 mb-3 outline-none border border-transparent focus:border-emerald-500">
+    <input type="password" id="password" placeholder="Password" class="w-full p-3 rounded-xl bg-slate-900 mb-4 outline-none border border-transparent focus:border-emerald-500">
 
-    <div class="glass p-10 rounded-3xl w-full max-w-md">
+    <button onclick="login()" class="w-full py-3 rounded-xl font-semibold btn-primary">Login</button>
 
-        <h1 class="text-3xl font-bold text-emerald-400 mb-6 text-center">
-            GEROTAK FARM LOGIN
-        </h1>
-
-        <input
-        type="text"
-        id="username"
-        placeholder="Username"
-        class="w-full p-4 rounded-2xl bg-slate-900 mb-4">
-
-        <input
-        type="password"
-        id="password"
-        placeholder="Password"
-        class="w-full p-4 rounded-2xl bg-slate-900 mb-6">
-
-        <button
-        onclick="login()"
-        class="w-full bg-emerald-500 hover:bg-emerald-600 p-4 rounded-2xl font-bold">
-
-            Login
-
-        </button>
-
-    </div>
-
+    <p class="text-xs text-slate-400 mt-4 text-center">Default: <strong>admin</strong> / <strong>1234</strong></p>
+  </div>
 </div>
 
 <!-- APP -->
-
 <div id="app" style="display:none;">
 
-<header class="sticky top-0 bg-black/40 backdrop-blur-xl border-b border-white/10 z-50">
+<header class="sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto p-4 flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center font-bold text-slate-900">GF</div>
+      <div>
+        <h1 class="text-xl font-bold text-emerald-300">GEROTAK FARM PRO</h1>
+        <p class="text-xs text-slate-400 -mt-1">AI Feed Formulation System</p>
+      </div>
+    </div>
 
-<div class="max-w-7xl mx-auto p-5 flex justify-between items-center">
-
-<div>
-
-<h1 class="text-3xl font-bold text-emerald-400">
-GEROTAK FARM PRO ULTIMATE
-</h1>
-
-<p class="text-slate-400">
-AI Feed Formulation System
-</p>
-
-</div>
-
-<div class="flex gap-3">
-
-<button
-onclick="saveFormula()"
-class="bg-blue-500 px-5 py-3 rounded-2xl font-bold">
-
-Save
-
-</button>
-
-<button
-onclick="exportPDF()"
-class="bg-red-500 px-5 py-3 rounded-2xl font-bold">
-
-Export PDF
-
-</button>
-
-</div>
-
-</div>
-
+    <div class="flex items-center gap-3">
+      <button onclick="saveFormula()" class="py-2 px-4 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold">Save</button>
+      <button onclick="exportPDF()" class="py-2 px-4 rounded-xl bg-red-500 hover:bg-red-600 text-white font-semibold">Export PDF</button>
+      <button onclick="logout()" class="py-2 px-4 rounded-xl bg-transparent border border-white/10 text-slate-200">Logout</button>
+    </div>
+  </div>
 </header>
 
-<section class="max-w-7xl mx-auto p-5 grid lg:grid-cols-3 gap-6">
+<main class="max-w-7xl mx-auto p-6 grid lg:grid-cols-3 gap-6">
 
-<!-- LEFT -->
+  <!-- LEFT -->
+  <aside class="glass rounded-2xl p-6">
+    <h2 class="text-lg font-bold mb-4">Penyusun Ransum AI</h2>
 
-<div class="glass rounded-3xl p-6">
+    <label class="block text-sm text-slate-300 mb-2">Jenis Ternak</label>
+    <select id="ternak" class="w-full p-3 rounded-xl bg-slate-900 mb-4">
+      <option value="broiler">Ayam Broiler</option>
+      <option value="layer">Ayam Petelur</option>
+      <option value="sapi">Sapi Potong</option>
+      <option value="kambing">Kambing</option>
+      <option value="bebek">Bebek</option>
+      <option value="lele">Lele</option>
+    </select>
 
-<h2 class="text-2xl font-bold mb-5">
-Penyusun Ransum AI
-</h2>
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div>
+        <label class="text-sm text-slate-300">Target Protein (%)</label>
+        <input type="number" id="protein" placeholder="Protein" value="21" class="w-full p-3 rounded-xl bg-slate-900">
+      </div>
+      <div>
+        <label class="text-sm text-slate-300">Target Energi</label>
+        <input type="number" id="energi" placeholder="Energi" value="3000" class="w-full p-3 rounded-xl bg-slate-900">
+      </div>
+    </div>
 
-<select
-id="ternak"
-class="w-full p-4 rounded-2xl bg-slate-900 mb-4">
+    <h3 class="font-semibold mb-2">Pilih Bahan</h3>
+    <div id="bahanContainer" class="grid grid-cols-2 gap-2 text-sm max-h-64 overflow-auto scroll-smooth mb-4 p-1">
+      <!-- bahan list injected here -->
+    </div>
 
-<option value="broiler">Ayam Broiler</option>
-<option value="layer">Ayam Petelur</option>
-<option value="sapi">Sapi Potong</option>
-<option value="kambing">Kambing</option>
-<option value="bebek">Bebek</option>
-<option value="lele">Lele</option>
+    <button onclick="optimasiAI()" class="w-full py-3 rounded-xl btn-primary font-semibold">AI Optimasi Formula</button>
+  </aside>
 
-</select>
+  <!-- RIGHT: main area -->
+  <section class="lg:col-span-2 space-y-4">
 
-<div class="grid grid-cols-2 gap-4 mb-4">
+    <div class="grid md:grid-cols-4 gap-4">
+      <div class="glass p-4 rounded-xl text-center">
+        <p class="text-sm text-slate-400">Protein</p>
+        <h2 id="hasilProtein" class="text-2xl font-bold text-emerald-300">0%</h2>
+      </div>
+      <div class="glass p-4 rounded-xl text-center">
+        <p class="text-sm text-slate-400">Energi</p>
+        <h2 id="hasilEnergi" class="text-2xl font-bold text-emerald-300">0</h2>
+      </div>
+      <div class="glass p-4 rounded-xl text-center">
+        <p class="text-sm text-slate-400">Harga/Kg</p>
+        <h2 id="hasilHarga" class="text-2xl font-bold text-emerald-300">Rp0</h2>
+      </div>
+      <div class="glass p-4 rounded-xl text-center">
+        <p class="text-sm text-slate-400">AI Status</p>
+        <h2 id="status" class="text-2xl font-bold text-yellow-400">Standby</h2>
+      </div>
+    </div>
 
-<input
-type="number"
-id="protein"
-placeholder="Protein"
-value="21"
-class="p-4 rounded-2xl bg-slate-900">
+    <!-- Table -->
+    <div class="glass p-4 rounded-2xl overflow-auto">
+      <h3 class="text-lg font-bold mb-3">Formula AI</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-separate" style="border-spacing:0 8px;">
+          <thead>
+            <tr>
+              <th class="text-left">Bahan</th>
+              <th>%</th>
+              <th>Protein</th>
+              <th>Energi</th>
+              <th>Harga</th>
+            </tr>
+          </thead>
+          <tbody id="hasilTable"></tbody>
+        </table>
+      </div>
+    </div>
 
-<input
-type="number"
-id="energi"
-placeholder="Energi"
-value="3000"
-class="p-4 rounded-2xl bg-slate-900">
+    <!-- Chart & Saved -->
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="glass p-4 rounded-2xl">
+        <h3 class="text-lg font-bold mb-3">Grafik Nutrisi</h3>
+        <canvas id="chartNutrisi" height="140"></canvas>
+      </div>
 
-</div>
+      <div class="glass p-4 rounded-2xl overflow-auto">
+        <h3 class="text-lg font-bold mb-3">Formula Tersimpan</h3>
+        <div id="savedFormula" class="text-sm text-slate-300">Belum ada formula</div>
+      </div>
+    </div>
 
-<h2 class="font-bold mb-3">
-Pilih Bahan
-</h2>
+  </section>
 
-<div id="bahanContainer"
-class="grid grid-cols-2 gap-2 text-sm max-h-72 overflow-auto">
+</main>
 
-</div>
-
-<button
-onclick="optimasiAI()"
-class="w-full bg-emerald-500 hover:bg-emerald-600 mt-6 p-4 rounded-2xl font-bold text-lg">
-
-AI Optimasi Formula
-
-</button>
-
-</div>
-
-<!-- RIGHT -->
-
-<div class="lg:col-span-2 space-y-6">
-
-<div class="grid md:grid-cols-4 gap-4">
-
-<div class="glass p-5 rounded-2xl">
-
-<p class="text-slate-400 text-sm">Protein</p>
-
-<h2 id="hasilProtein"
-class="text-3xl font-bold text-emerald-400">
-0%
-</h2>
-
-</div>
-
-<div class="glass p-5 rounded-2xl">
-
-<p class="text-slate-400 text-sm">Energi</p>
-
-<h2 id="hasilEnergi"
-class="text-3xl font-bold text-emerald-400">
-0
-</h2>
-
-</div>
-
-<div class="glass p-5 rounded-2xl">
-
-<p class="text-slate-400 text-sm">Harga/Kg</p>
-
-<h2 id="hasilHarga"
-class="text-3xl font-bold text-emerald-400">
-Rp0
-</h2>
-
-</div>
-
-<div class="glass p-5 rounded-2xl">
-
-<p class="text-slate-400 text-sm">AI Status</p>
-
-<h2 id="status"
-class="text-2xl font-bold text-yellow-400">
-Standby
-</h2>
-
-</div>
-
-</div>
-
-<!-- TABLE -->
-
-<div class="glass p-6 rounded-3xl overflow-auto">
-
-<h2 class="text-2xl font-bold mb-5">
-Formula AI
-</h2>
-
-<table class="w-full">
-
-<thead>
-
-<tr class="border-b border-white/10">
-
-<th class="text-left py-3">Bahan</th>
-<th>%</th>
-<th>Protein</th>
-<th>Energi</th>
-<th>Harga</th>
-
-</tr>
-
-</thead>
-
-<tbody id="hasilTable">
-
-</tbody>
-
-</table>
-
-</div>
-
-<!-- CHART -->
-
-<div class="glass p-6 rounded-3xl">
-
-<h2 class="text-2xl font-bold mb-5">
-Grafik Nutrisi
-</h2>
-
-<canvas id="chartNutrisi"></canvas>
-
-</div>
-
-<!-- SAVED -->
-
-<div class="glass p-6 rounded-3xl">
-
-<h2 class="text-2xl font-bold mb-5">
-Formula Tersimpan
-</h2>
-
-<div id="savedFormula"></div>
-
-</div>
-
-</section>
+<footer class="max-w-7xl mx-auto p-4 text-xs text-slate-400">© 2026 Gerotak Farm · Built with ❤️</footer>
 
 </div>
 
 <script>
-
 // ===================================================
 // LOGIN
 // ===================================================
-
 function login(){
-
-    let u =
-    document.getElementById("username").value;
-
-    let p =
-    document.getElementById("password").value;
-
-    if(u==="admin" && p==="1234"){
-
-        document.getElementById("loginPage").style.display="none";
-
-        document.getElementById("app").style.display="block";
-
-    }else{
-
-        alert("Login gagal");
-
+    const u = document.getElementById("username").value.trim();
+    const p = document.getElementById("password").value.trim();
+    if(u === "admin" && p === "1234"){
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("app").style.display = "block";
+    } else {
+        alert("Login gagal — cek username/password");
     }
-
+}
+function logout(){
+  document.getElementById("app").style.display = "none";
+  document.getElementById("loginPage").style.display = "flex";
 }
 
 // ===================================================
-// DATABASE 100+ BAHAN
+// DATABASE BAHAN
 // ===================================================
-
 const bahanData = {
-
-jagung:{nama:"Jagung",protein:8.5,energi:3300,harga:5500,max:60},
-dedak:{nama:"Dedak",protein:12,energi:2400,harga:4000,max:30},
-pollard:{nama:"Pollard",protein:17,energi:2200,harga:5200,max:20},
-bungkil:{nama:"Bungkil Kedelai",protein:44,energi:2550,harga:9800,max:25},
-tepungikan:{nama:"Tepung Ikan",protein:55,energi:2900,harga:12000,max:10},
-mbm:{nama:"MBM",protein:48,energi:2600,harga:8500,max:10},
-cpo:{nama:"CPO",protein:0,energi:8600,harga:13000,max:5},
-molases:{nama:"Molases",protein:4,energi:2200,harga:3500,max:10},
-rumput:{nama:"Rumput Gajah",protein:10,energi:1800,harga:1500,max:60},
-odot:{nama:"Rumput Odot",protein:12,energi:1900,harga:1800,max:60},
-indigofera:{nama:"Indigofera",protein:27,energi:2300,harga:3200,max:30},
-silase:{nama:"Silase",protein:8,energi:2400,harga:2000,max:70},
-premix:{nama:"Premix",protein:0,energi:0,harga:15000,max:2},
-
-// tambahan database besar
-
-bekatul:{nama:"Bekatul",protein:13,energi:2500,harga:4200,max:25},
-gaplek:{nama:"Gaplek",protein:3,energi:3100,harga:3500,max:40},
-onggok:{nama:"Onggok",protein:2,energi:2800,harga:2200,max:25},
-azolla:{nama:"Azolla",protein:25,energi:2000,harga:1500,max:20},
-daunsingkong:{nama:"Daun Singkong",protein:22,energi:1900,harga:1800,max:20},
-ampastahu:{nama:"Ampas Tahu",protein:23,energi:2400,harga:2500,max:30},
-ampaskelapa:{nama:"Ampas Kelapa",protein:8,energi:2600,harga:1800,max:20},
-bungkilsawit:{nama:"Bungkil Sawit",protein:16,energi:2200,harga:2700,max:30}
-
+  jagung:{nama:"Jagung",protein:8.5,energi:3300,harga:5500,max:60},
+  dedak:{nama:"Dedak",protein:12,energi:2400,harga:4000,max:30},
+  pollard:{nama:"Pollard",protein:17,energi:2200,harga:5200,max:20},
+  bungkil:{nama:"Bungkil Kedelai",protein:44,energi:2550,harga:9800,max:25},
+  tepungikan:{nama:"Tepung Ikan",protein:55,energi:2900,harga:12000,max:10},
+  mbm:{nama:"MBM",protein:48,energi:2600,harga:8500,max:10},
+  cpo:{nama:"CPO",protein:0,energi:8600,harga:13000,max:5},
+  molases:{nama:"Molases",protein:4,energi:2200,harga:3500,max:10},
+  rumput:{nama:"Rumput Gajah",protein:10,energi:1800,harga:1500,max:60},
+  odot:{nama:"Rumput Odot",protein:12,energi:1900,harga:1800,max:60},
+  indigofera:{nama:"Indigofera",protein:27,energi:2300,harga:3200,max:30},
+  silase:{nama:"Silase",protein:8,energi:2400,harga:2000,max:70},
+  premix:{nama:"Premix",protein:0,energi:0,harga:15000,max:2},
+  bekatul:{nama:"Bekatul",protein:13,energi:2500,harga:4200,max:25},
+  gaplek:{nama:"Gaplek",protein:3,energi:3100,harga:3500,max:40},
+  onggok:{nama:"Onggok",protein:2,energi:2800,harga:2200,max:25},
+  azolla:{nama:"Azolla",protein:25,energi:2000,harga:1500,max:20},
+  daunsingkong:{nama:"Daun Singkong",protein:22,energi:1900,harga:1800,max:20},
+  ampastahu:{nama:"Ampas Tahu",protein:23,energi:2400,harga:2500,max:30},
+  ampaskelapa:{nama:"Ampas Kelapa",protein:8,energi:2600,harga:1800,max:20},
+  bungkilsawit:{nama:"Bungkil Sawit",protein:16,energi:2200,harga:2700,max:30}
 };
 
-// ===================================================
-// LOAD BAHAN
-// ===================================================
-
-let bahanContainer =
-document.getElementById("bahanContainer");
-
-for(let key in bahanData){
-
-    bahanContainer.innerHTML += `
-    
-    <label>
-    <input type="checkbox"
-    class="bahan"
-    value="${key}"
-    checked>
-
-    ${bahanData[key].nama}
-    </label>
-
-    `;
-
+// render bahan as checklist with labels
+const bahanContainer = document.getElementById("bahanContainer");
+for(const key in bahanData){
+  const b = bahanData[key];
+  const wrapper = document.createElement('label');
+  wrapper.className = 'bahan-label';
+  wrapper.innerHTML = `<input type="checkbox" class="bahan" value="${key}" checked /> <div class="flex-1"><div class="font-medium">${b.nama}</div><div class="text-xs text-slate-400">Protein ${b.protein}% · Energi ${b.energi} · Rp ${b.harga.toLocaleString('id-ID')}</div></div>`;
+  bahanContainer.appendChild(wrapper);
 }
 
 // ===================================================
 // AI OPTIMASI
 // ===================================================
-
 let chart;
-
 function optimasiAI(){
+    const proteinTarget = Number(document.getElementById("protein").value) || 0;
+    const energiTarget = Number(document.getElementById("energi").value) || 0;
+    const checkboxes = document.querySelectorAll('.bahan:checked');
+    if(checkboxes.length === 0){ alert('Pilih minimal 1 bahan'); return; }
 
-    let proteinTarget =
-    Number(document.getElementById("protein").value);
+    const bahanDipilih = Array.from(checkboxes).map(c=>bahanData[c.value]);
+    // keep simple: sort by harga (cheapest first) as heuristic
+    bahanDipilih.sort((a,b)=>a.harga - b.harga);
 
-    let energiTarget =
-    Number(document.getElementById("energi").value);
+    // distribute percentages equally (simple baseline)
+    const table = document.getElementById('hasilTable');
+    table.innerHTML = '';
+    const persen = 100 / bahanDipilih.length;
 
-    let checkboxes =
-    document.querySelectorAll(".bahan:checked");
+    let totalProtein = 0, totalEnergi = 0, totalHarga = 0;
+    bahanDipilih.forEach(b=>{
+        totalProtein += b.protein * (persen/100);
+        totalEnergi += b.energi * (persen/100);
+        totalHarga += b.harga * (persen/100);
 
-    let bahanDipilih = [];
-
-    checkboxes.forEach((c)=>{
-
-        bahanDipilih.push(bahanData[c.value]);
-
+        const tr = document.createElement('tr');
+        tr.className = 'bg-transparent';
+        tr.innerHTML = `<td class="py-2">${b.nama}</td><td>${persen.toFixed(1)}%</td><td>${b.protein}%</td><td>${b.energi}</td><td>Rp ${b.harga.toLocaleString('id-ID')}</td>`;
+        table.appendChild(tr);
     });
 
-    bahanDipilih.sort((a,b)=>a.harga-b.harga);
+    document.getElementById('hasilProtein').textContent = totalProtein.toFixed(2) + '%';
+    document.getElementById('hasilEnergi').textContent = Math.round(totalEnergi);
+    document.getElementById('hasilHarga').textContent = 'Rp ' + Math.round(totalHarga).toLocaleString('id-ID');
 
-    let totalProtein=0;
-    let totalEnergi=0;
-    let totalHarga=0;
-
-    let table =
-    document.getElementById("hasilTable");
-
-    table.innerHTML="";
-
-    let persen =
-    100 / bahanDipilih.length;
-
-    bahanDipilih.forEach((b)=>{
-
-        totalProtein +=
-        b.protein * (persen/100);
-
-        totalEnergi +=
-        b.energi * (persen/100);
-
-        totalHarga +=
-        b.harga * (persen/100);
-
-        table.innerHTML += `
-        
-        <tr class="border-b border-white/5">
-        
-        <td class="py-3">${b.nama}</td>
-        <td>${persen.toFixed(1)}%</td>
-        <td>${b.protein}%</td>
-        <td>${b.energi}</td>
-        <td>Rp ${b.harga.toLocaleString("id-ID")}</td>
-        
-        </tr>
-        
-        `;
-
-    });
-
-    document.getElementById("hasilProtein")
-    .innerHTML =
-    totalProtein.toFixed(2)+"%";
-
-    document.getElementById("hasilEnergi")
-    .innerHTML =
-    totalEnergi.toFixed(0);
-
-    document.getElementById("hasilHarga")
-    .innerHTML =
-    "Rp "+totalHarga.toLocaleString("id-ID");
-
-    // STATUS AI
-
-    if(
-        totalProtein >= proteinTarget &&
-        totalEnergi >= energiTarget
-    ){
-
-        document.getElementById("status")
-        .innerHTML = "Optimal";
-
-        document.getElementById("status")
-        .className =
-        "text-2xl font-bold text-emerald-400";
-
-    }else{
-
-        document.getElementById("status")
-        .innerHTML = "Perlu Optimasi";
-
-        document.getElementById("status")
-        .className =
-        "text-2xl font-bold text-red-400";
-
+    // status
+    const statusEl = document.getElementById('status');
+    if(totalProtein >= proteinTarget && totalEnergi >= energiTarget){
+        statusEl.textContent = 'Optimal';
+        statusEl.className = 'text-2xl font-bold text-emerald-400';
+    } else {
+        statusEl.textContent = 'Perlu Optimasi';
+        statusEl.className = 'text-2xl font-bold text-red-400';
     }
 
-    // CHART
-
-    if(chart){
-
-        chart.destroy();
-
-    }
-
-    let ctx =
-    document.getElementById("chartNutrisi");
-
-    chart =
-    new Chart(ctx,{
-
-        type:"bar",
-
+    // chart
+    if(chart) chart.destroy();
+    const ctx = document.getElementById('chartNutrisi').getContext('2d');
+    chart = new Chart(ctx,{
+        type:'bar',
         data:{
-
-            labels:["Protein","Energi","Harga"],
-
-            datasets:[{
-
-                label:"Nutrisi",
-
-                data:[
-                    totalProtein,
-                    totalEnergi,
-                    totalHarga
-                ]
-
-            }]
-
-        }
-
+            labels:['Protein (%)','Energi','Harga (Rp)'],
+            datasets:[{label:'Nilai',backgroundColor:['#10b981','#06b6d4','#0891b2'],data:[Number(totalProtein.toFixed(2)), Math.round(totalEnergi), Math.round(totalHarga)]}]
+        },
+        options:{responsive:true,plugins:{legend:{display:false}} ,scales:{y:{beginAtZero:true}}}
     });
-
 }
 
 // ===================================================
-// SAVE FORMULA
+// SAVE / LOAD FORMULA
 // ===================================================
-
 function saveFormula(){
-
-    let data =
-    document.getElementById("hasilTable").innerHTML;
-
-    localStorage.setItem(
-        "formulaGerotak",
-        data
-    );
-
+    const data = document.getElementById('hasilTable').innerHTML;
+    if(!data){ alert('Belum ada formula untuk disimpan'); return; }
+    localStorage.setItem('formulaGerotak', data);
     tampilFormula();
-
-    alert("Formula disimpan");
-
+    alert('Formula disimpan');
 }
-
 function tampilFormula(){
-
-    let data =
-    localStorage.getItem("formulaGerotak");
-
-    document.getElementById("savedFormula")
-    .innerHTML =
-    data || "Belum ada formula";
-
+    const data = localStorage.getItem('formulaGerotak');
+    document.getElementById('savedFormula').innerHTML = data || 'Belum ada formula';
 }
-
+// initial load
 tampilFormula();
 
 // ===================================================
 // EXPORT PDF
 // ===================================================
-
 async function exportPDF(){
-
     const { jsPDF } = window.jspdf;
-
-    const doc =
-    new jsPDF();
-
-    doc.text(
-        "GEROTAK FARM PRO FORMULA",
-        10,
-        10
-    );
-
-    doc.text(
-        document.getElementById("hasilTable").innerText,
-        10,
-        20
-    );
-
-    doc.save("formula-ransum.pdf");
-
+    const doc = new jsPDF({unit:'pt', format:'a4'});
+    doc.setFontSize(14);
+    doc.text('GEROTAK FARM PRO - FORMULA', 40, 40);
+    const tableText = document.getElementById('hasilTable').innerText || 'Belum ada data';
+    // split into lines
+    const lines = doc.splitTextToSize(tableText, 520);
+    doc.setFontSize(10);
+    doc.text(lines, 40, 70);
+    doc.save('formula-ransum.pdf');
 }
 
 </script>
